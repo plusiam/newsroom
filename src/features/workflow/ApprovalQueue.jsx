@@ -14,12 +14,13 @@ const ApprovalQueue = () => {
 
     return (
         <div className="min-h-screen bg-gray-50">
-            <header className="bg-indigo-600 text-white shadow-lg">
+            <header className="bg-indigo-600 text-white shadow-lg" role="banner">
                 <div className="container mx-auto px-4 py-4 flex justify-between items-center">
                     <h1 className="text-2xl font-bold">기사 검토 대기열</h1>
                     <button
                         onClick={() => navigate('/dashboard')}
                         className="px-4 py-2 bg-indigo-700 rounded-lg hover:bg-indigo-800 transition"
+                        aria-label="대시보드로 돌아가기"
                     >
                         돌아가기
                     </button>
@@ -45,21 +46,27 @@ const ApprovalQueue = () => {
                                         <span className="text-sm text-gray-500">{article.author}</span>
                                     </div>
                                     <h3 className="text-xl font-bold mb-2">{article.title}</h3>
-                                    <p className="text-gray-600 mb-4">{article.content}</p>
+                                    {/* 리치 텍스트 미리보기 - 프로덕션에서는 DOMPurify 사용 권장 */}
+                                    <div
+                                        className="text-gray-600 mb-4 prose prose-sm max-w-none line-clamp-3"
+                                        dangerouslySetInnerHTML={{ __html: article.content }}
+                                    />
 
                                     <div className="flex gap-3">
                                         <button
                                             onClick={() => handleApprove(article.id, true)}
                                             className="flex items-center gap-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition"
+                                            aria-label={`${article.title} 기사 승인`}
                                         >
-                                            <CheckCircle className="w-4 h-4" />
+                                            <CheckCircle className="w-4 h-4" aria-hidden="true" />
                                             승인
                                         </button>
                                         <button
                                             onClick={() => handleApprove(article.id, false)}
                                             className="flex items-center gap-2 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
+                                            aria-label={`${article.title} 기사 반려`}
                                         >
-                                            <XCircle className="w-4 h-4" />
+                                            <XCircle className="w-4 h-4" aria-hidden="true" />
                                             반려
                                         </button>
                                     </div>

@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import toast from 'react-hot-toast';
 import storage from '../services/storage';
 
 const AppDataContext = createContext(null);
@@ -32,22 +33,33 @@ export const AppDataProvider = ({ children }) => {
 
     const addArticle = (article) => {
         setArticles(prev => [...prev, article]);
+        toast.success('기사가 저장되었습니다.');
     };
 
     const updateArticle = (id, updates) => {
         setArticles(prev => prev.map(a => a.id === id ? { ...a, ...updates } : a));
+        if (updates.status === 'approved') {
+            toast.success('기사가 승인되었습니다.');
+        } else if (updates.status === 'rejected') {
+            toast.error('기사가 반려되었습니다.');
+        } else {
+            toast.success('기사가 수정되었습니다.');
+        }
     };
 
     const deleteArticle = (id) => {
         setArticles(prev => prev.filter(a => a.id !== id));
+        toast.success('기사가 삭제되었습니다.');
     };
 
     const addNewspaper = (newspaper) => {
         setNewspapers(prev => [...prev, newspaper]);
+        toast.success('신문이 발행되었습니다.');
     };
 
     const updateOrgSettings = (newSettings) => {
         setOrgSettings(newSettings);
+        toast.success('조직 설정이 저장되었습니다.');
     };
 
     return (
