@@ -20,3 +20,103 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+/* YouTube 임베드 반응형 스타일 */
+.ProseMirror .youtube-wrapper {
+  position: relative;
+  padding-bottom: 56.25%; /* 16:9 비율 */
+  height: 0;
+  overflow: hidden;
+  max-width: 100%;
+  margin: 1rem 0;
+  border-radius: 0.5rem;
+}
+
+.ProseMirror .youtube-wrapper iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 0.5rem;
+}
+
+/* Slash 명령어 메뉴 스타일 */
+.slash-menu {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  padding: 0.5rem;
+  max-height: 300px;
+  overflow-y: auto;
+  min-width: 280px;
+}
+
+.slash-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  transition: background-color 0.15s;
+  border: none;
+  background: transparent;
+  width: 100%;
+  text-align: left;
+}
+
+.slash-menu-item:hover,
+.slash-menu-item.selected {
+  background-color: #f3f4f6;
+}
+
+.slash-menu-item-icon {
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f9fafb;
+  border-radius: 0.25rem;
+  flex-shrink: 0;
+}
+
+.slash-menu-item-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.slash-menu-item-title {
+  font-weight: 500;
+  color: #111827;
+  font-size: 0.875rem;
+}
+
+.slash-menu-item-description {
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin-top: 0.125rem;
+}
+
+/* 에디터 placeholder 스타일 */
+.ProseMirror p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  color: #9ca3af;
+  pointer-events: none;
+  height: 0;
+}
+
+/* 드래그 앤 드롭 이미지 스타일 */
+.ProseMirror img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 0.5rem;
+  margin: 0.5rem 0;
+}
+
+.ProseMirror img.ProseMirror-selectednode {
+  outline: 3px solid #6366f1;
+}

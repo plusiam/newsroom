@@ -4,10 +4,13 @@ import StarterKit from '@tiptap/starter-kit';
 import Image from '@tiptap/extension-image';
 import Link from '@tiptap/extension-link';
 import TextAlign from '@tiptap/extension-text-align';
+import Youtube from '@tiptap/extension-youtube';
+import Placeholder from '@tiptap/extension-placeholder';
+import { SlashCommand } from './SlashCommandExtension';
 import {
     Bold, Italic, Strikethrough, Heading1, Heading2, Heading3,
     List, ListOrdered, Image as ImageIcon, Link as LinkIcon,
-    AlignLeft, AlignCenter, AlignRight, Undo, Redo
+    AlignLeft, AlignCenter, AlignRight, Undo, Redo, Youtube as YoutubeIcon
 } from 'lucide-react';
 
 const MenuButton = ({ onClick, isActive, disabled, children, title }) => (
@@ -189,6 +192,17 @@ const MenuBar = ({ editor }) => {
                         className="hidden"
                     />
                 </label>
+                <MenuButton
+                    onClick={() => {
+                        const url = window.prompt('YouTube URL을 입력하세요');
+                        if (url) {
+                            editor.chain().focus().setYoutubeVideo({ src: url }).run();
+                        }
+                    }}
+                    title="YouTube 동영상 삽입"
+                >
+                    <YoutubeIcon size={18} />
+                </MenuButton>
             </div>
         </div>
     );
@@ -198,13 +212,26 @@ const RichTextEditor = ({ content, onChange }) => {
     const editor = useEditor({
         extensions: [
             StarterKit,
-            Image,
+            Image.configure({
+                inline: true,
+                allowBase64: true,
+            }),
             Link.configure({
                 openOnClick: false,
             }),
             TextAlign.configure({
                 types: ['heading', 'paragraph'],
             }),
+            Youtube.configure({
+                width: '100%',
+                height: 480,
+                controls: true,
+                nocookie: true,
+            }),
+            Placeholder.configure({
+                placeholder: "글을 작성하세요. '/'를 입력하면 명령어 메뉴가 나타납니다.",
+            }),
+            SlashCommand,
         ],
         content: content,
         onUpdate: ({ editor }) => {
@@ -213,6 +240,50 @@ const RichTextEditor = ({ content, onChange }) => {
         editorProps: {
             attributes: {
                 class: 'prose prose-sm sm:prose lg:prose-lg xl:prose-2xl m-5 focus:outline-none min-h-[400px] max-w-none',
+            },
+            // Drag & Drop 이미지 처리
+            handleDrop: (view, event, slice, moved) => {
+                if (!moved && event.dataTransfer && event.dataTransfer.files && event.dataTransfer.files[0]) {
+                    const file = event.dataTransfer.files[0];
+                    const fileType = file.type;
+
+                    if (fileType.startsWith('image/')) {
+                        event.preventDefault();
+                        const reader = new FileReader();
+                        reader.onload = (e) => {
+                            const { schema } = view.state;
+                            const coordinates = view.posAtCoords({ left: event.clientX, top: event.clientY });
+                            const node = schema.nodes.image.create({ src: e.target.result });
+                            const transaction = view.state.tr.insert(coordinates.pos, node);
+                            view.dispatch(transaction);
+                        };
+                        reader.readAsDataURL(file);
+                        return true;
+                    }
+                }
+                return false;
+            },
+            // 클립보드에서 이미지 붙여넣기
+            handlePaste: (view, event, slice) => {
+                const items = Array.from(event.clipboardData?.items || []);
+                for (const item of items) {
+                    if (item.type.startsWith('image/')) {
+                        event.preventDefault();
+                        const file = item.getAsFile();
+                        if (file) {
+                            const reader = new FileReader();
+                            reader.onload = (e) => {
+                                const { schema } = view.state;
+                                const node = schema.nodes.image.create({ src: e.target.result });
+                                const transaction = view.state.tr.replaceSelectionWith(node);
+                                view.dispatch(transaction);
+                            };
+                            reader.readAsDataURL(file);
+                        }
+                        return true;
+                    }
+                }
+                return false;
             },
         },
     });
@@ -226,3 +297,4 @@ const RichTextEditor = ({ content, onChange }) => {
 };
 
 export default RichTextEditor;
+
